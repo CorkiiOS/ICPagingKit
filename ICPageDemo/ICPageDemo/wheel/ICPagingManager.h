@@ -6,28 +6,16 @@
 //
 //
 
-#import <Foundation/Foundation.h>
-#import "ICPagingManagerProtocol.h"
-#import "ICTabToolStyleModel.h"
-#import "ICTabToolSetter.h"
+#import <UIKit/UIKit.h>
+#import "ICPagingKitDefines.h"
 
-@protocol ICTabToolProtocol, ICPagingManagerProtocol;
-@class ICTabToolTemplate;
+NS_ASSUME_NONNULL_BEGIN
+
+@protocol ICPagingManagerProtocol;
+@class ICTabToolTemplate,ICTabToolStyleModel;
 
 
 @interface ICPagingManager : NSObject
-
-/**
- UIVIewController
- */
-@property (nonatomic, weak) id<ICPagingManagerProtocol>delegate;
-
-
-/**
- 默认YES
- */
-@property (nonatomic, assign) BOOL scrollEnabled;
-
 
 /**
  实例化
@@ -43,7 +31,20 @@
  @param block 提供个性化配置
  */
 - (void)updateTabToolStyle:(void(^)(ICTabToolStyleModel *style))block;
+
+/**
+ UIVIewController
+ */
+@property (nonatomic, weak) id<ICPagingManagerProtocol>delegate;
+
+
+/**
+ 默认YES
+ */
+@property (nonatomic, assign) BOOL scrollEnabled;
+
 @end
+
 
 
 @protocol ICPagingManagerProtocol <NSObject>
@@ -54,7 +55,7 @@
  
  @return ICPagingComponentStyle
  */
-- (ICTabToolStyle)style;
+- (ICTabToolStyle)styleForTabTool;
 
 
 /**
@@ -62,10 +63,22 @@
  
  @return 标题位置
  */
-- (CGRect)tabToolFrame;
+- (CGRect)frameForTabTool;
 
+
+/**
+ 选项卡的superview 默认为主控制器的view
+
+ @return UIView
+ */
 - (UIView *)superViewForTabTool;
 
+
+/**
+ 自定义选项卡
+
+ @return 继承 ICTabToolTemplate 的选项卡
+ */
 - (ICTabToolTemplate *)customTabTool;
 
 @required
@@ -74,20 +87,23 @@
  
  @return 子控制器数组
  */
-- (NSArray <UIViewController *>*)pagingControllerComponentChildViewControllers;
+- (NSArray <UIViewController *>*)childViewControllersForMainViewController;
 
 /**
  标题
  
  @return 标题数组
  */
-- (NSArray <NSString *>*)pagingControllerComponentTabToolTitles;
+- (NSArray <NSString *>*)titleArrayForTabTool;
 
 /**
  内容
  
  @return 内容高度
  */
-- (CGFloat)pagingControllerComponentContainerViewHeight;
+- (CGFloat)heightForViewInChildViewController;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "ICPagingManager.h"
+#import "ICPagingKit.h"
 @interface ViewController ()<ICPagingManagerProtocol>
 @property (nonatomic, strong) ICPagingManager *manager;
 
@@ -24,33 +24,36 @@
     [self.manager updateTabToolStyle:^(ICTabToolStyleModel *style) {
         style.normalColor = [UIColor yellowColor];
     }];
-    
 }
 
-- (NSArray<UIViewController *> *)pagingControllerComponentChildViewControllers {
+
+- (CGRect)frameForTabTool {
+    return CGRectMake(0, 64, self.view.bounds.size.width, 50);
+}
+
+- (nonnull NSArray<UIViewController *> *)childViewControllersForMainViewController {
     UIViewController *v = [UIViewController new];
     v.view.backgroundColor = [UIColor redColor];
     
     UIViewController *v1 = [UIViewController new];
     v1.view.backgroundColor = [UIColor cyanColor];
-
+    
     UIViewController *v2 = [UIViewController new];
     v2.view.backgroundColor = [UIColor yellowColor];
-
-
+    
+    
     return @[v,v1,v2];
 }
 
-- (CGFloat)pagingControllerComponentContainerViewHeight {
+- (CGFloat)heightForViewInChildViewController {
     return self.view.bounds.size.height - 64 - 50;
+
 }
 
-- (NSArray<NSString *> *)pagingControllerComponentSegmentTitles {
+- (nonnull NSArray<NSString *> *)titleArrayForTabTool {
     return @[@"哈哈", @"哈啊哈哈",
              @"hahah"];
 }
 
-- (CGRect)pagingControllerComponentSegmentFrame {
-    return CGRectMake(0, 64, self.view.bounds.size.width, 50);
-}
+
 @end

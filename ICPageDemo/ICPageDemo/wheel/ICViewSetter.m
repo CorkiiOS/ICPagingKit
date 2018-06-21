@@ -20,19 +20,12 @@
     BOOL _isForbidScrollDelegate;
 }
 
-+ (instancetype)containerWithFrame:(CGRect)frame
-{
++ (instancetype)containerWithFrame:(CGRect)frame {
     ICViewSetter *container = [[ICViewSetter alloc] initWithFrame:frame];
     return container;
 }
 
-- (void)setScrollEnable:(BOOL)scrollEnable {
-    _scrollEnable = scrollEnable;
-    self.scrollView.scrollEnabled = scrollEnable;
-}
-
-- (instancetype)initWithFrame:(CGRect)frame
-{
+- (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self)
     {
@@ -41,16 +34,19 @@
     return self;
 }
 
-- (void)setContainerViewContentOffsetAtIndex:(NSInteger)index
-{
+- (void)setScrollEnable:(BOOL)scrollEnable {
+    _scrollEnable = scrollEnable;
+    self.scrollView.scrollEnabled = scrollEnable;
+}
+
+- (void)viewScrollToIndex:(NSInteger)index {
     _isForbidScrollDelegate = YES;
     CGFloat offsetx = index * self.width;
     [_scrollView setContentOffset:CGPointMake(offsetx, 0)];
     [self setupViewWithIndex:index];
 }
 
-- (void)setChildControllers:(NSArray<UIViewController *> *)childControllers
-{
+- (void)setChildControllers:(NSArray<UIViewController *> *)childControllers {
     _childControllers = childControllers;
     
     [self.scrollView setContentSize:CGSizeMake(self.scrollView.width * self.childControllers.count, 0)];
@@ -63,32 +59,31 @@
     }
 }
 
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-{
-    NSInteger index = scrollView.contentOffset.x / self.width;
-    [self setupViewWithIndex:index];
-    
-    if (self.delegate && [self.delegate respondsToSelector:@selector(IC_containerView:
-                                                                     didEndScroll:)])
-    {
-        [self.delegate IC_containerView:self
-                           didEndScroll:scrollView];
-    }
-}
-
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
-{
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     _startOffsetX = scrollView.contentOffset.x;
     _isForbidScrollDelegate = NO;
     
-    if ([self.delegate respondsToSelector:@selector(IC_containerView:didBeginDragging:)])
-    {
-        [self.delegate IC_containerView:self didBeginDragging:scrollView];
+    if ([self.delegate respondsToSelector:@selector(view:didBeginDragging:)]) {
+        [self.delegate view:self didBeginDragging:scrollView];
     }
 }
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if ([self.delegate respondsToSelector:@selector(view:didEndDragging:)]) {
+        [self.delegate view:self didEndDragging:scrollView];
+    }
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    NSInteger index = scrollView.contentOffset.x / self.width;
+    [self setupViewWithIndex:index];
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(view:didEndScroll:)]){
+        [self.delegate view:self didEndScroll:scrollView];
+    }
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if (_isForbidScrollDelegate) { return; }
     
     NSInteger sourceIndex = 0;
@@ -146,21 +141,17 @@
         
     }
     
-    if (_delegate && [_delegate respondsToSelector:@selector(IC_containerView:
-                                                             progress:
-                                                             sourceIndex:
-                                                             targetIndex:)])
-    {
-        [_delegate IC_containerView:self
-                           progress:progress
-                        sourceIndex:sourceIndex
-                        targetIndex:targetIndex];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(view:srollFromIndex:toIndex:progress:)]) {
+        [_delegate view:self srollFromIndex:sourceIndex toIndex:targetIndex progress:progress];
     }
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(view:didScroll:)]) {
+        [self.delegate view:self didScroll:scrollView];
+    }
+    
 }
 
-
-- (void)setupViewWithIndex:(NSInteger)index
-{
+- (void)setupViewWithIndex:(NSInteger)index {
     UIViewController *vc = self.childControllers[index];
     vc.view.frame = self.scrollView.bounds;
     if (vc.view.superview) return;

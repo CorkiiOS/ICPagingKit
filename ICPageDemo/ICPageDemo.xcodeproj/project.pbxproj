@@ -44,6 +44,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		48E9BA6720DBF988002EB9A0 /* ICPagingKitDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ICPagingKitDefines.h; sourceTree = "<group>"; };
+		48E9BA6820DBFA2F002EB9A0 /* ICPagingKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ICPagingKit.h; sourceTree = "<group>"; };
 		DBD83ECA20DB82980026EEAB /* ICPageDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ICPageDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBD83ECD20DB82980026EEAB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		DBD83ECE20DB82980026EEAB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -64,8 +66,6 @@
 		DBD83F3D20DB85CF0026EEAB /* ICTabToolSetter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ICTabToolSetter.m; sourceTree = "<group>"; };
 		DBD83F3E20DB85CF0026EEAB /* UIView+ICFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+ICFrame.m"; sourceTree = "<group>"; };
 		DBD83F3F20DB85CF0026EEAB /* ICViewSetter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ICViewSetter.h; sourceTree = "<group>"; };
-		DBD83F4120DB85CF0026EEAB /* ICPagingManagerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ICPagingManagerProtocol.h; sourceTree = "<group>"; };
-		DBD83F4220DB85CF0026EEAB /* ICTabToolProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ICTabToolProtocol.h; sourceTree = "<group>"; };
 		DBD83F4320DB85CF0026EEAB /* ICPagingManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ICPagingManager.m; sourceTree = "<group>"; };
 		DBD83F4520DB85CF0026EEAB /* ICTabToolStyleModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ICTabToolStyleModel.m; sourceTree = "<group>"; };
 		DBD83F4620DB85CF0026EEAB /* ICTabToolStyleModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ICTabToolStyleModel.h; sourceTree = "<group>"; };
@@ -165,28 +165,18 @@
 		DBD83F3B20DB85CF0026EEAB /* wheel */ = {
 			isa = PBXGroup;
 			children = (
+				48E9BA6820DBFA2F002EB9A0 /* ICPagingKit.h */,
+				48E9BA6720DBF988002EB9A0 /* ICPagingKitDefines.h */,
 				DBD83F3C20DB85CF0026EEAB /* ICPagingManager.h */,
 				DBD83F4320DB85CF0026EEAB /* ICPagingManager.m */,
 				DBD83F5120DB85CF0026EEAB /* ICTabToolSetter.h */,
 				DBD83F3D20DB85CF0026EEAB /* ICTabToolSetter.m */,
 				DBD83F3F20DB85CF0026EEAB /* ICViewSetter.h */,
 				DBD83F5020DB85CF0026EEAB /* ICViewSetter.m */,
-				DBD83F5220DB85CF0026EEAB /* UIView+ICFrame.h */,
-				DBD83F3E20DB85CF0026EEAB /* UIView+ICFrame.m */,
-				DBD83F4020DB85CF0026EEAB /* protocol */,
 				DBD83F4420DB85CF0026EEAB /* Model */,
 				DBD83F4720DB85CF0026EEAB /* TabTool */,
 			);
 			path = wheel;
-			sourceTree = "<group>";
-		};
-		DBD83F4020DB85CF0026EEAB /* protocol */ = {
-			isa = PBXGroup;
-			children = (
-				DBD83F4120DB85CF0026EEAB /* ICPagingManagerProtocol.h */,
-				DBD83F4220DB85CF0026EEAB /* ICTabToolProtocol.h */,
-			);
-			path = protocol;
 			sourceTree = "<group>";
 		};
 		DBD83F4420DB85CF0026EEAB /* Model */ = {
@@ -201,6 +191,8 @@
 		DBD83F4720DB85CF0026EEAB /* TabTool */ = {
 			isa = PBXGroup;
 			children = (
+				DBD83F5220DB85CF0026EEAB /* UIView+ICFrame.h */,
+				DBD83F3E20DB85CF0026EEAB /* UIView+ICFrame.m */,
 				DBD83F4920DB85CF0026EEAB /* ICSystemSegmentedControl.h */,
 				DBD83F4D20DB85CF0026EEAB /* ICSystemSegmentedControl.m */,
 				DBD83F4F20DB85CF0026EEAB /* ICTabToolNormal.h */,

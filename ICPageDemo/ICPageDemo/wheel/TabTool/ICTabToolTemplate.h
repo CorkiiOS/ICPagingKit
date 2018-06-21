@@ -8,20 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@protocol ICTabToolTemplateDelegate<NSObject>
-
-/**
- 选项卡
- 
- @param index 点击选项
- @param formIndex 上次点击的选项
- */
-- (void)tabToolDidSelectIndex:(NSInteger)index
-                       fromIndex:(NSInteger)formIndex;
-
-@end
+NS_ASSUME_NONNULL_BEGIN
 
 @class ICTabToolStyleModel;
+@protocol ICTabToolTemplateDelegate;
 
 @interface ICTabToolTemplate : UIView
 
@@ -47,3 +37,17 @@
 + (instancetype)tabToolWithFrame:(CGRect)frame;
 
 @end
+
+@protocol ICTabToolTemplateDelegate<NSObject>
+
+/**
+ 选项卡
+ 
+ @param index 点击选项
+ @param formIndex 上次点击的选项
+ */
+- (void)tabToolDidSelectIndex:(NSInteger)index
+                    fromIndex:(NSInteger)formIndex;
+
+@end
+NS_ASSUME_NONNULL_END

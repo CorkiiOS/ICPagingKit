@@ -1,24 +1,23 @@
+////
+////  ICSystemSegmentedControl.h
+////  AFNetworking
+////
+////  Created by mac on 2017/11/7.
+////
 //
-//  ICSystemSegmentedControl.h
-//  AFNetworking
+//#import <UIKit/UIKit.h>
 //
-//  Created by mac on 2017/11/7.
+//@interface ICSystemSegmentedControl : UISegmentedControl
 //
-
-#import <UIKit/UIKit.h>
-#import "ICTabToolProtocol.h"
-
-@interface ICSystemSegmentedControl : UISegmentedControl<ICTabToolProtocol>
-
-@property (nonatomic, weak) id <ICTabToolProtocol> delegate;
-@property (nonatomic, strong) NSArray <NSString *>*items;
-@property (nonatomic, assign) NSInteger selectedIndex;
-
-//更新标题属性
-- (void)updateWithConfig:(void(^)(ICTabToolStyleModel *config))block;
-//进度
-- (void)setTitleWithProgress:(CGFloat)progress
-                 sourceIndex:(NSInteger)sourceIndex
-                 targetIndex:(NSInteger)targetIndex;
-
-@end
+//@property (nonatomic, weak) id <ICTabToolProtocol> delegate;
+//@property (nonatomic, strong) NSArray <NSString *>*items;
+//@property (nonatomic, assign) NSInteger selectedIndex;
+//
+////更新标题属性
+//- (void)updateWithConfig:(void(^)(ICTabToolStyleModel *config))block;
+////进度
+//- (void)setTitleWithProgress:(CGFloat)progress
+//                 sourceIndex:(NSInteger)sourceIndex
+//                 targetIndex:(NSInteger)targetIndex;
+//
+//@end

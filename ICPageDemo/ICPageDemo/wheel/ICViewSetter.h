@@ -8,34 +8,33 @@
 
 #import <UIKit/UIKit.h>
 
-@class ICViewSetter;
-@protocol ICViewSetterDelegate <NSObject>
+@protocol ICViewSetterDelegate;
 
-@optional
-
-- (void)IC_containerView:(ICViewSetter *)containerView
-            didBeginDragging:(UIScrollView *)scrollView;
-
-- (void)IC_containerView:(ICViewSetter *)containerView
-            didEndScroll:(UIScrollView *)scrollView;
-
-- (void)IC_containerView:(ICViewSetter *)containerView
-               progress:(CGFloat)progress
-            sourceIndex:(NSInteger)sourceIndex
-            targetIndex:(NSInteger)targetIndex;
-@end
+NS_ASSUME_NONNULL_BEGIN
 
 @interface ICViewSetter : UIView
 
-@property (nonatomic, strong) NSArray <UIViewController *>*childControllers;
 @property (nonatomic, weak) id <ICViewSetterDelegate>delegate;
-
+@property (nonatomic, strong) NSArray <UIViewController *>*childControllers;
 @property (nonatomic, assign) BOOL scrollEnable;
 
 + (instancetype)containerWithFrame:(CGRect)frame;
 
-- (void)setContainerViewContentOffsetAtIndex:(NSInteger)index;
-
-
+- (void)viewScrollToIndex:(NSInteger)index;
 
 @end
+
+@protocol ICViewSetterDelegate <NSObject>
+
+@optional
+
+- (void)view:(ICViewSetter *)view didBeginDragging:(UIScrollView *)scrollView;
+- (void)view:(ICViewSetter *)view didEndDragging:(UIScrollView *)scrollView;
+- (void)view:(ICViewSetter *)view didScroll:(UIScrollView *)scrollView;
+- (void)view:(ICViewSetter *)view didEndScroll:(UIScrollView *)scrollView;
+
+- (void)view:(ICViewSetter *)view srollFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex progress:(CGFloat)progress;
+
+@end
+
+NS_ASSUME_NONNULL_END
