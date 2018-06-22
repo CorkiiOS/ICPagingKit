@@ -43,6 +43,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign) BOOL scrollEnabled;
 
+/**
+ 默认YES
+ */
+@property (nonatomic, assign) BOOL bounces;
+
 @end
 
 
@@ -59,11 +64,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /**
- frame
+ frame 默认为 （0，导航高度，屏幕宽度，49）
  
  @return 标题位置
  */
 - (CGRect)frameForTabTool;
+
+/**
+ 内容
+ 
+ @return 内容高度
+ */
+- (CGFloat)heightForViewInChildViewController;
 
 
 /**
@@ -95,13 +107,6 @@ NS_ASSUME_NONNULL_BEGIN
  @return 标题数组
  */
 - (NSArray <NSString *>*)titleArrayForTabTool;
-
-/**
- 内容
- 
- @return 内容高度
- */
-- (CGFloat)heightForViewInChildViewController;
 
 @end
 

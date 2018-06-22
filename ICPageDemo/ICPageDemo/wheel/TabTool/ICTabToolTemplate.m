@@ -23,9 +23,7 @@
     
 }
 
-- (void)setSourceIndex:(NSInteger)sourceIndex
-           targetIndex:(NSInteger)targetIndex
-              progress:(CGFloat)progress {
+- (void)setFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex progress:(CGFloat)progress {
     
 }
 

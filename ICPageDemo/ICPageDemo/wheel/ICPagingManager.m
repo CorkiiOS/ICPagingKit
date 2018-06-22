@@ -43,11 +43,11 @@
     return manager;
 }
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         _scrollEnabled = YES;
+        _bounces = YES;
     }
     return self;
 }
@@ -64,6 +64,11 @@
 - (void)setScrollEnabled:(BOOL)scrollEnabled {
     _scrollEnabled = scrollEnabled;
     self.container.scrollEnable = scrollEnabled;
+}
+
+- (void)setBounces:(BOOL)bounces {
+    _bounces = bounces;
+    self.container.bounces = bounces;
 }
 
 - (void)updateTabToolStyle:(void(^)(ICTabToolStyleModel *style))block {
@@ -93,7 +98,7 @@
 }
 
 - (void)view:(ICViewSetter *)view srollFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex progress:(CGFloat)progress {
-    [self.bar setSourceIndex:fromIndex targetIndex:toIndex progress:progress];
+    [self.bar setFromIndex:fromIndex toIndex:toIndex progress:progress];
 }
 
 
@@ -101,8 +106,7 @@
  获取数据源
  */
 - (ICTabToolStyle)tabToolStyle {
-    if ([self.delegate respondsToSelector:@selector(styleForTabTool)])
-    {
+    if ([self.delegate respondsToSelector:@selector(styleForTabTool)]) {
         return  [self.delegate styleForTabTool];
     }
     return ICTabToolStyleNormal;
@@ -123,12 +127,24 @@
 }
 
 - (CGRect)tabToolFrame {
-    NSAssert([self.delegate respondsToSelector:@selector(frameForTabTool)], @"自定义风格需要实现pagingControllerComponentSegmentFrame协议");
-    return [self.delegate frameForTabTool];
+    CGFloat navH = [UIApplication sharedApplication].statusBarFrame.size.height + 44;
+    CGSize size = [UIScreen mainScreen].bounds.size;
+    CGRect tabToolFrame = CGRectMake(0, navH, size.width, 49);
+    if ([self.delegate respondsToSelector:@selector(frameForTabTool)]) {
+        tabToolFrame = [self.delegate frameForTabTool];
+    }
+    return tabToolFrame;
 }
 
 - (CGFloat)viewHeight {
-    return [self.delegate heightForViewInChildViewController];
+    CGFloat navH = [UIApplication sharedApplication].statusBarFrame.size.height + 44;
+    CGFloat height = [UIScreen mainScreen].bounds.size.height;
+    CGFloat offset = IC_iPhoneX? 34 : 0;
+    CGFloat viewHeight = height - navH - 49 - offset;
+    if ([self.delegate respondsToSelector:@selector(heightForViewInChildViewController)]) {
+        viewHeight = [self.delegate heightForViewInChildViewController];
+    }
+    return viewHeight;
 }
 
 - (UIView *)viewInMainViewController {
@@ -141,7 +157,10 @@
 }
 
 - (CGRect)viewFrameInMainViewController {
-    CGRect viewFrame = CGRectMake(self.tabToolFrame.origin.x, CGRectGetMaxY(self.tabToolFrame), self.tabToolFrame.size.width, self.viewHeight);
+    CGRect viewFrame = CGRectMake(self.tabToolFrame.origin.x,
+                                  CGRectGetMaxY(self.tabToolFrame),
+                                  self.tabToolFrame.size.width,
+                                  self.viewHeight);
     return viewFrame;
 }
 
@@ -162,10 +181,12 @@
 
 - (ICViewSetter *)container {
     if (_container == nil) {
-        _container = [ICViewSetter containerWithFrame:self.viewFrameInMainViewController];
+        _container = [ICViewSetter containerWithFrame:self.viewFrameInMainViewController
+                                    mainViewControler:self.mainViewController
+                                     childControllers:self.childVCs];
         _container.scrollEnable = self.scrollEnabled;
         _container.delegate = self;
-        _container.childControllers = self.childVCs;
+        _container.bounces = self.bounces;
         [self.viewInMainViewController addSubview:_container];
     }
     return _container;

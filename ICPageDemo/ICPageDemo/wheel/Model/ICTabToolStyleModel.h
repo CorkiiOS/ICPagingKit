@@ -8,7 +8,7 @@
 
 
 #import <UIKit/UIKit.h>
-
+#import "ICPagingKitDefines.h"
 @interface ICTabToolStyleModel : NSObject
 
 /**
@@ -36,6 +36,25 @@
  标题字号
  */
 @property (nonatomic, assign) CGFloat titleFont;
+
+/**
+ 下划线风格
+ */
+@property (nonatomic, assign) ICTabToolUnderLineStyle underLineStyle;
+
+
+/**
+ 文字动画
+ */
+@property (nonatomic, assign) ICTabToolTextAnimatedStyle textAnimatedStyle;
+
+
+/**
+ 下划线动画风格
+ */
+@property (nonatomic, assign) ICTabToolUnderLineAnimatedStyle underLineAnimatedStyle;
+
+
 
 /**
  默认配置

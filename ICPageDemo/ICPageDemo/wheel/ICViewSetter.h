@@ -15,10 +15,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ICViewSetter : UIView
 
 @property (nonatomic, weak) id <ICViewSetterDelegate>delegate;
-@property (nonatomic, strong) NSArray <UIViewController *>*childControllers;
 @property (nonatomic, assign) BOOL scrollEnable;
+@property (nonatomic, assign) BOOL bounces;
 
-+ (instancetype)containerWithFrame:(CGRect)frame;
++ (instancetype)containerWithFrame:(CGRect)frame
+                 mainViewControler:(UIViewController *)mainViewControler
+                  childControllers:(NSArray <UIViewController *>*)childControllers;
 
 - (void)viewScrollToIndex:(NSInteger)index;
 

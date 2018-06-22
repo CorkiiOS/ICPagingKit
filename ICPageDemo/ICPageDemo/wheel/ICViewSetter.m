@@ -8,11 +8,22 @@
 
 #import "ICViewSetter.h"
 #import "UIView+ICFrame.h"
-@interface ICViewSetter()<UIScrollViewDelegate>
 
-@property (nonatomic, strong) UIScrollView *scrollView;
+@interface ICGesScrollView :UIScrollView
+
+@property (nonatomic, copy) BOOL(^shouldBeginPanGestureHandler)(UIScrollView *scorllView, UIPanGestureRecognizer *pan);
 
 @end
+
+
+@interface ICViewSetter()<UIScrollViewDelegate,UIGestureRecognizerDelegate>
+
+@property (nonatomic, strong) ICGesScrollView *scrollView;
+@property (nonatomic, weak) UIViewController *mainViewController;
+@property (nonatomic, strong) NSArray <UIViewController *>*childControllers;
+
+@end
+
 
 @implementation ICViewSetter {
     
@@ -20,16 +31,45 @@
     BOOL _isForbidScrollDelegate;
 }
 
-+ (instancetype)containerWithFrame:(CGRect)frame {
-    ICViewSetter *container = [[ICViewSetter alloc] initWithFrame:frame];
++ (instancetype)containerWithFrame:(CGRect)frame mainViewControler:(nonnull UIViewController *)mainViewControler childControllers:(NSArray<UIViewController *> *)childControllers {
+    ICViewSetter *container = [[ICViewSetter alloc] initWithFrame:frame cmainViewControler:mainViewControler childControllers:childControllers];
     return container;
 }
 
-- (instancetype)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame cmainViewControler:(nonnull UIViewController *)mainViewControler childControllers:(NSArray<UIViewController *> *)childControllers {
     self = [super initWithFrame:frame];
-    if (self)
-    {
+    if (self) {
+        _mainViewController = mainViewControler;
+        _childControllers = childControllers;
+        
         self.scrollView.backgroundColor = [UIColor whiteColor];
+        [self.scrollView setContentSize:CGSizeMake(self.scrollView.width * childControllers.count, 0)];
+        
+        if (childControllers.count > 0) {
+            UIViewController *vc = childControllers[0];
+            vc.view.frame = self.scrollView.bounds;
+            [self.scrollView addSubview:vc.view];
+        }
+        
+        UINavigationController *nav = (UINavigationController *)_mainViewController.parentViewController;
+        
+        if ([nav isKindOfClass:[UINavigationController class]]) {
+            if (nav.childViewControllers.count > 1) {
+                [self.scrollView setShouldBeginPanGestureHandler:^BOOL(UIScrollView *scorllView, UIPanGestureRecognizer *pan) {
+                    CGFloat transionX = [pan translationInView:pan.view].x;
+                    if (scorllView.contentOffset.x == 0 && transionX > 0) {
+                        nav.interactivePopGestureRecognizer.enabled = YES;
+                    }
+                    else {
+                        nav.interactivePopGestureRecognizer.enabled = NO;
+                    }
+                    return YES;
+                }];
+                
+            }
+            
+        }
+
     }
     return self;
 }
@@ -39,24 +79,16 @@
     self.scrollView.scrollEnabled = scrollEnable;
 }
 
+- (void)setBounces:(BOOL)bounces {
+    _bounces = bounces;
+    self.scrollView.bounces = bounces;
+}
+
 - (void)viewScrollToIndex:(NSInteger)index {
     _isForbidScrollDelegate = YES;
     CGFloat offsetx = index * self.width;
     [_scrollView setContentOffset:CGPointMake(offsetx, 0)];
     [self setupViewWithIndex:index];
-}
-
-- (void)setChildControllers:(NSArray<UIViewController *> *)childControllers {
-    _childControllers = childControllers;
-    
-    [self.scrollView setContentSize:CGSizeMake(self.scrollView.width * self.childControllers.count, 0)];
-    
-    if (self.childControllers.count > 0)
-    {
-        UIViewController *vc = self.childControllers[0];
-        vc.view.frame = self.scrollView.bounds;
-        [self.scrollView addSubview:vc.view];
-    }
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
@@ -81,68 +113,40 @@
     if (self.delegate && [self.delegate respondsToSelector:@selector(view:didEndScroll:)]){
         [self.delegate view:self didEndScroll:scrollView];
     }
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(view:srollFromIndex:toIndex:progress:)]) {
+        [_delegate view:self srollFromIndex:index toIndex:index progress:1.0];
+    }
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if (_isForbidScrollDelegate) { return; }
+    if (_isForbidScrollDelegate || scrollView.contentOffset.x <= 0 || scrollView.contentOffset.x >= scrollView.contentSize.width - scrollView.bounds.size.width){ return; }
     
-    NSInteger sourceIndex = 0;
-    NSInteger targetIndex = 0;
-    CGFloat progress = 0;
+    CGFloat tempProgress = scrollView.contentOffset.x / self.bounds.size.width;
+    NSInteger tempIndex = tempProgress;
+    CGFloat progress = tempProgress - floor(tempProgress);
+    CGFloat deltaX = scrollView.contentOffset.x - _startOffsetX;
+    NSInteger fromIndex = 0;
+    NSInteger toIndex = 0;
     
-    CGFloat currentOffsetX = scrollView.contentOffset.x;
-    CGFloat scrollViewW = scrollView.bounds.size.width;
-    
-    //左滑动
-    if (_startOffsetX > currentOffsetX)
-    {
-        
-        progress = 1- (currentOffsetX / scrollViewW - floor(currentOffsetX / scrollViewW));
-        
-        sourceIndex = (currentOffsetX/scrollViewW);
-        
-        targetIndex = sourceIndex + 1;
-        if (targetIndex >= self.childControllers.count)
-        {
-            targetIndex = self.childControllers.count - 1;
+    if (deltaX > 0) {
+        if (progress == 0.0) {
+            return;
         }
+        toIndex = tempIndex + 1;
+        fromIndex = tempIndex;
         
-        // 4.如果完全划过去
-        if ((currentOffsetX - _startOffsetX) == scrollViewW)
-        {
-            progress = 1;
-            targetIndex = sourceIndex;
-        }
+    }else if (deltaX < 0) {
+        progress = 1.0 - progress;
+        fromIndex = tempIndex + 1;
+        toIndex = tempIndex;
         
-    }
-    else
-    {
-        // 1.计算progress
-        progress = (currentOffsetX / scrollViewW - floor(currentOffsetX / scrollViewW));
-        
-        // 2.计算targetIndex
-        targetIndex = (currentOffsetX / scrollViewW);
-        
-        // 3.计算sourceIndex
-        sourceIndex = targetIndex + 1;
-        
-        if ((currentOffsetX - _startOffsetX) == scrollViewW)
-        {
-            progress = 1;
-            sourceIndex -=1;
-            targetIndex -=1;
-        }
-        
-        if (sourceIndex >= self.childControllers.count)
-        {
-            sourceIndex = self.childControllers.count - 1;
-        }
-        
-        
+    }else {
+        return;
     }
     
     if (self.delegate && [self.delegate respondsToSelector:@selector(view:srollFromIndex:toIndex:progress:)]) {
-        [_delegate view:self srollFromIndex:sourceIndex toIndex:targetIndex progress:progress];
+        [_delegate view:self srollFromIndex:fromIndex toIndex:toIndex progress:progress];
     }
     
     if (self.delegate && [self.delegate respondsToSelector:@selector(view:didScroll:)]) {
@@ -158,18 +162,32 @@
     [self.scrollView addSubview:vc.view];
 }
 
-- (UIScrollView *)scrollView {
+- (ICGesScrollView *)scrollView {
     if (_scrollView == nil) {
-        _scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
+        _scrollView = [[ICGesScrollView alloc] initWithFrame:self.bounds];
         _scrollView.delegate = self;
         _scrollView.showsHorizontalScrollIndicator = NO;
         _scrollView.showsVerticalScrollIndicator = NO;
         _scrollView.pagingEnabled = YES;
-        _scrollView.bounces = NO;
+        _scrollView.bounces = YES;
         [self addSubview:_scrollView];
     }
     
     return _scrollView;
 }
+
+@end
+
+@implementation ICGesScrollView
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if (self.shouldBeginPanGestureHandler && gestureRecognizer == self.panGestureRecognizer){
+        return self.shouldBeginPanGestureHandler(self,self.panGestureRecognizer);
+    }
+    else {
+        return [super gestureRecognizerShouldBegin:gestureRecognizer];
+    }
+}
+
 
 @end

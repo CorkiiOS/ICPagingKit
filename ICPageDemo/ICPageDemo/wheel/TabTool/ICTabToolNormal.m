@@ -57,7 +57,7 @@ static CGFloat const ICTabToolMargin = 10;
         [self.contentView addSubview:btn];
     }
     _lastBtn = self.itemBtns.count > 0?  self.itemBtns[0] : nil;
-    _lastBtn.selected = YES;
+    [_lastBtn setTitleColor:self.style.selectColor forState:(UIControlStateNormal)];
     [self setNeedsLayout];//标记需要重新布局
     [self layoutIfNeeded];
     
@@ -69,9 +69,9 @@ static CGFloat const ICTabToolMargin = 10;
     {
         [btn sizeToFit];
         [btn setTitleColor:self.style.normalColor forState:UIControlStateNormal];
-        [btn setTitleColor:self.style.selectColor forState:UIControlStateSelected];
         [btn.titleLabel setFont:[UIFont systemFontOfSize:self.style.titleFont]];
     }
+    [_lastBtn setTitleColor:self.style.selectColor forState:(UIControlStateNormal)];
     self.indicatorView.backgroundColor = self.style.indicatorColor;
     self.contentView.backgroundColor = self.style.backgroundColor;
 }
@@ -93,8 +93,8 @@ static CGFloat const ICTabToolMargin = 10;
                                       fromIndex:_lastBtn.tag];
     }
     
-    _lastBtn.selected = NO;
-    sender.selected = YES;
+    [_lastBtn setTitleColor:self.style.normalColor forState:(UIControlStateNormal)];
+    [sender setTitleColor:self.style.selectColor forState:(UIControlStateNormal)];
     _lastBtn = sender;
     
     [UIView animateWithDuration:0.1 animations:^
@@ -117,60 +117,65 @@ static CGFloat const ICTabToolMargin = 10;
     
     [self.contentView setContentOffset:CGPointMake(scrollx, 0) animated:YES];
 }
-- (void)setTitleWithProgress:(CGFloat)progress
-                 sourceIndex:(NSInteger)sourceIndex
-                 targetIndex:(NSInteger)targetIndex
-{
-    // 1.取出sourceLabel/targetLabel
-    UIButton *sourceBtn = self.itemBtns[sourceIndex];
-    UIButton *targetBtn =  self.itemBtns[targetIndex];
+
+- (void)setFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex progress:(CGFloat)progress {
+    if (fromIndex < 0 ||
+        fromIndex >= self.itemBtns.count ||
+        toIndex < 0 ||
+        toIndex >= self.itemBtns.count
+        ) {
+        return;
+    }
+    UIButton *fromBtn = self.itemBtns[fromIndex];
+    UIButton *toBtn =  self.itemBtns[toIndex];
     
-    // 2.处理滑块的逻辑
-    CGFloat moveTotalX = sourceBtn.frame.origin.x - targetBtn.frame.origin.x ;
-    CGFloat moveX = moveTotalX * progress;
+    CGFloat xDistance = toBtn.x - fromBtn.x;
+    CGFloat wDistance = toBtn.width - fromBtn.width;
     
-    CGRect scrollLineFrame = self.indicatorView.frame;
+    self.indicatorView.x = fromBtn.x + xDistance *progress;
+    self.indicatorView.width = fromBtn.width + wDistance * progress;
     
-    scrollLineFrame.origin.x = targetBtn.frame.origin.x + moveX;;
     
-    self.indicatorView.frame = scrollLineFrame;
-    // 3.颜色的渐变(复杂)
-    // 3.1.取出变化的范围
-    //    CGFloat normalR, normalG, normalB = 0;
-    //    CGFloat selectedR, selectedG, selectedB = 0;
-    //
-    //    [self getRGBColor:self.style.normalColor r:&normalR g:&normalG b:&normalB];
-    //    [self getRGBColor:self.style.selectColor r:&selectedR g:&selectedG b:&selectedB];
-    //
-    //    CGFloat r = (selectedR - normalR) * progress;
-    //    CGFloat g = (selectedG - normalG) * progress;
-    //    CGFloat b = (selectedB - normalB) * progress;
-    //
-    //    // 3.2.变化targetLabel
-    //
-    //    [sourceBtn setTitleColor:[UIColor colorWithRed:normalR + r green:normalG + g blue:normalB + b alpha:1.0] forState:UIControlStateNormal];
-    //
-    //    [targetBtn setTitleColor:[UIColor colorWithRed:selectedR + r green:selectedG + g blue:selectedB + b alpha:1.0] forState:UIControlStateNormal];
     
-    // 4.记录最新的index
+    NSArray *selArray = [self getRGBColor:self.style.selectColor];
+    NSArray *norArray = [self getRGBColor:self.style.normalColor];
+
+    CGFloat to_r = [norArray[0] floatValue];
+    CGFloat to_g = [norArray[1] floatValue];
+    CGFloat to_b = [norArray[2] floatValue];
+    CGFloat from_r = [selArray[0] floatValue];
+    CGFloat from_g = [selArray[1] floatValue];
+    CGFloat from_b = [selArray[2] floatValue];
+    CGFloat mid_r = [norArray[0] floatValue] - [selArray[0] floatValue];
+    CGFloat mid_g = [norArray[1] floatValue] - [selArray[1] floatValue];
+    CGFloat mid_b = [norArray[2] floatValue] - [selArray[2] floatValue];
+
+    [fromBtn setTitleColor:[UIColor colorWithRed:(from_r + mid_r * progress)
+                                           green:(from_g + mid_g * progress)
+                                            blue:(from_b + mid_b * progress)
+                                           alpha:1.0]
+                  forState:(UIControlStateNormal)];
+    
+    [toBtn setTitleColor:[UIColor colorWithRed:(to_r - mid_r * progress)
+                                         green:(to_g - mid_g * progress)
+                                          blue:(to_b - mid_b * progress)
+                                         alpha:1.0]
+                forState:(UIControlStateNormal)];
 }
 
-- (void)getRGBColor:(UIColor *)color
-                  r:(CGFloat *)r
-                  g:(CGFloat *)g
-                  b:(CGFloat *)b
-{
+
+- (NSArray *)getRGBColor:(UIColor *)color {
     CGColorRef cgColor = [color CGColor];
     NSInteger numComponents = CGColorGetNumberOfComponents(cgColor);
     
     if (numComponents == 4) {
         
         const CGFloat *components = CGColorGetComponents(cgColor);
-        *r = components[0];
-        *g = components[1];
-        *b = components[2];
+        return @[@(components[0]),
+                 @(components[1]),
+                 @(components[2])];
     }
-    
+    return nil;
 }
 
 - (void)layoutSubviews

@@ -27,12 +27,10 @@ NS_ASSUME_NONNULL_BEGIN
  设置
  
  @param progress 进度
- @param sourceIndex 原来Index
- @param targetIndex 目标Index
+ @param fromIndex 原来Index
+ @param toIndex 目标Index
  */
-- (void)setSourceIndex:(NSInteger)sourceIndex
-           targetIndex:(NSInteger)targetIndex
-              progress:(CGFloat)progress;
+- (void)setFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex progress:(CGFloat)progress;
 
 + (instancetype)tabToolWithFrame:(CGRect)frame;
 
